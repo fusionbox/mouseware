@@ -7,7 +7,8 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js"></script>
     <script type="text/javascript">
       (function(exports, $) {
-        var events_left = 100
+        var TOTAL_EVENTS = 1000
+          , events_left = TOTAL_EVENTS
           , buffer
           , random_2 = function(bits) {
               var hex = buffer.slice(0, Math.ceil(bits/4));
@@ -54,31 +55,55 @@
           return entropy;
         };
 
-
-        $(document).mousemove(function(event) {
-          var x = event.clientX
-            , y = event.clientY
-            , ms = event.timeStamp;
-          buffer = Crypto.SHA256(buffer + x + y + ms);
-          events_left--;
-          if ( ! events_left ) {
-            $('#generate').show();
-          }
-        });
-
-
         $(document).ready(function() {
+          var more_entropy_progress_div = $('#more_entropy .progress div');
           $('#generate button').click(function() {
-            $('#generate .password').text(exports.sentencePassword(['adjective', 'noun', 'verb', 'adjective', 'noun']));
+            var template = ['adjective', 'noun', 'verb', 'adjective', 'noun'];
+            $('#generate .password').text(exports.sentencePassword(template));
+            $('#generate .entropy').text(exports.templateEntropy(template).toFixed(1) + " bits of entropy");
+
+          });
+          $(document).mousemove(function(event) {
+            var x = event.clientX
+              , y = event.clientY
+              , ms = event.timeStamp;
+            buffer = Crypto.SHA256(buffer + x + y + ms);
+            events_left--;
+            if (  events_left == 0 ) {
+              $('#more_entropy').hide();
+              $('#generate').show();
+            }
+            else if ( events_left > 0 && events_left % 10 == 0 )
+            {
+              more_entropy_progress_div.css('width', ((TOTAL_EVENTS - events_left)/TOTAL_EVENTS * 100) + '%');
+            }
           });
         });
       })(window, jQuery);
     </script>
+    <style>
+      .progress {
+        width: 300px;
+        height: 50px;
+        border: 1px solid black;
+      }
+      .progress > div {
+        background-color: orange;
+        height: inherit;
+      }
+    </style>
   </head>
   <body>
     <div id="generate" style="display: none;">
       <div class="password"></div>
+      <div class="entropy"></div>
       <button>Generate</button>
+    </div>
+    <div id="more_entropy">
+      Move your mouse around
+      <div class="progress">
+        <div style="width: 0"></div>
+      </div>
     </div>
   </body>
 </html>
