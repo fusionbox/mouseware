@@ -38,15 +38,22 @@
           return words.join(" ");
         };
 
-        exports.sentencePassword = function() {
+        exports.sentencePassword = function(template) {
           sentence = [];
-          sentence.push(exports.randomChoice(words.adjectives));
-          sentence.push(exports.randomChoice(words.nouns));
-          sentence.push(exports.randomChoice(words.verbs));
-          sentence.push(exports.randomChoice(words.adjectives));
-          sentence.push(exports.randomChoice(words.nouns));
+          for ( var i = 0; i < template.length; i++ ) {
+            sentence.push(exports.randomChoice(words[template[i] + "s"]));
+          }
           return sentence.join(" ");
-        }
+        };
+
+        exports.templateEntropy = function(template) {
+          var entropy = 0;
+          for ( var i = 0; i < template.length; i++ ) {
+            entropy += Math.log(words[template[i] + "s"].length)/Math.log(2);
+          }
+          return entropy;
+        };
+
 
         $(document).mousemove(function(event) {
           var x = event.clientX
@@ -62,7 +69,7 @@
 
         $(document).ready(function() {
           $('#generate button').click(function() {
-            $('#generate .password').text(exports.sentencePassword());
+            $('#generate .password').text(exports.sentencePassword(['adjective', 'noun', 'verb', 'adjective', 'noun']));
           });
         });
       })(window, jQuery);
