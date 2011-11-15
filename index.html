@@ -7,7 +7,7 @@
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js"></script>
     <script type="text/javascript">
       (function(exports, $) {
-        var TOTAL_EVENTS = 1000
+        var TOTAL_EVENTS = 100
           , events_left = TOTAL_EVENTS
           , buffer
           , random_2 = function(bits) {
@@ -81,28 +81,83 @@
         });
       })(window, jQuery);
     </script>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:700,400' rel='stylesheet' type='text/css'>
     <style>
       .progress {
         width: 300px;
         height: 50px;
         border: 1px solid black;
+        margin: 20px auto;
+        border-radius: 3px;
+        border: solid 3px #ddd;
+        background-color: #ddd;
+        background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.01, #fff), color-stop(1.00, #eee));
+        background-image: -moz-linear-gradient(center bottom, #fff 1%, #eee 100%);
       }
       .progress > div {
         background-color: orange;
         height: inherit;
       }
+
+      body {
+        width: 100%;
+        font-family: "Open Sans";
+      }
+
+      #container {
+        text-align: center;
+        margin: 50px auto;
+      }
+
+      .password {
+        font-size: 1.5em;
+      }
+
+      .entropy {
+        margin-top: 5px;
+        color: #666;
+      }
+
+      #generate button {
+        margin-top: 20px;
+        color: #ffffff;
+        cursor: pointer;
+        font-size: 24px;
+        font-weight: bold;
+        font-family: "Open Sans";
+        margin: 5px;
+        padding: 4px 10px 6px 10px;
+        text-decoration: none;
+        -moz-border-radius: 3px;
+        -webkit-border-radius: 3px;
+        border-radius: 3px;
+        border: solid 1px #557766;
+        background-color: #4BA822;
+        background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.01, #2B8802), color-stop(1.00, #4BA822));
+        background-image: -moz-linear-gradient(center bottom, #2B8802 1%, #4BA822 100%);
+        text-shadow: #333333 0px 1px 0px;
+        letter-spacing: -1px;
+      }
+      #generate button:hover {
+        background-color: #56C325;
+        background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.01, #36a305), color-stop(1.00, #56C325));
+        background-image: -moz-linear-gradient(center bottom, #36a305 1%, #56C325 100%);
+        -moz-box-shadow: 0px 1px 2px #aaaaaa; -webkit-box-shadow: 0px 1px 2px #aaaaaa; box-shadow: 0px 1px 2px #aaaaaa;
+      }
     </style>
   </head>
   <body>
-    <div id="generate" style="display: none;">
-      <div class="password"></div>
-      <div class="entropy"></div>
-      <button>Generate</button>
-    </div>
-    <div id="more_entropy">
-      Move your mouse around
-      <div class="progress">
-        <div style="width: 0"></div>
+    <div id="container">
+      <div id="generate" style="display: none;">
+        <div class="password"></div>
+        <div class="entropy"></div>
+        <button>Generate</button>
+      </div>
+      <div id="more_entropy">
+        Move your mouse around
+        <div class="progress">
+          <div style="width: 0"></div>
+        </div>
       </div>
     </div>
   </body>
