@@ -38,6 +38,16 @@
           return words.join(" ");
         };
 
+        exports.sentencePassword = function() {
+          sentence = [];
+          sentence.push(exports.randomChoice(words.adjectives));
+          sentence.push(exports.randomChoice(words.nouns));
+          sentence.push(exports.randomChoice(words.verbs));
+          sentence.push(exports.randomChoice(words.adjectives));
+          sentence.push(exports.randomChoice(words.nouns));
+          return sentence.join(" ");
+        }
+
         $(document).mousemove(function(event) {
           var x = event.clientX
             , y = event.clientY
@@ -52,7 +62,7 @@
 
         $(document).ready(function() {
           $('#generate button').click(function() {
-            $('#generate .password').text(randomPassword(4));
+            $('#generate .password').text(exports.sentencePassword());
           });
         });
       })(window, jQuery);
