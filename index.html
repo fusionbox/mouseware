@@ -9,16 +9,27 @@
       (function(exports, $) {
         var TOTAL_EVENTS = 500
           , events_left = TOTAL_EVENTS
-          , buffer
-          , random_2 = function(bits) {
-              var hex = buffer.slice(0, Math.ceil(bits/4));
-              buffer = Crypto.SHA256(buffer);
-              return parseInt(hex, 16);
-            };
+          , buffer = ''
+        
+        function random_2(bits) {
+          if ( Math.ceil(bits/4) > buffer.length )
+            throw new Error('Not enough bits in buffer');
+          var hex = buffer.slice(0, Math.ceil(bits/4));
+          buffer = Crypto.SHA256(buffer); // refresh the buffer
+          return parseInt(hex, 16);
+        };
+
+        function parseOptions(options) {
+          return jQuery.extend({
+              use_dirty: false
+            }, options);
+        };
 
         exports.random = function(max) {
+          if ( max <= 1 )
+            throw new Error('random() expects a max greater than 1');
           var bits = Math.ceil(Math.log(max)/Math.log(2))
-          var n;
+            , n;
 
           do {
             n = random_2(bits);
@@ -27,42 +38,88 @@
         };
 
         exports.randomChoice = function(ary) {
+          if ( ary.length == 0 )  return void(0);
+          if ( ary.length == 1 )  return ary[0];
           var index = exports.random(ary.length);
           return ary[index];
         };
 
         exports.randomPassword = function(n) {
-          var words = []
+          var password = ''
+            , charlist = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`-=~!@#$%^&*()_+[]\{}|;:",./<>?'.split('');
           while ( n-- ) {
-            words.push(exports.randomChoice(wordlist));
+            password += exports.randomChoice(charlist);
           }
-          return words.join(" ");
+          return password;
         };
 
-        exports.sentencePassword = function(template) {
-          sentence = [];
-          for ( var i = 0; i < template.length; i++ ) {
-            sentence.push(exports.randomChoice(words[template[i] + "s"]));
+        exports.sentencePassword = function(template, options) {
+          var entropy = 0
+            , sentence = []
+            , haystack,
+            i;
+          
+          options = parseOptions(options);
+          
+          for ( i = 0; i < template.length; i++ ) {
+            if ( ! words[template[i] + "s"] )
+              throw new Error('Unknown token "' + template[i] + '"');
+            
+            haystack = words[template[i] + "s"];
+            if ( options.use_dirty )
+              haystack = haystack.concat(words["dirty_" + template[i] + "s"]);
+            sentence.push(exports.randomChoice(haystack));
+            entropy += Math.log(haystack.length)/Math.log(2);
           }
-          return sentence.join(" ");
+          
+          if ( options.use_dirty )
+          {
+            // choose a random word to replace with a dirty word
+            i = exports.random(template.length);
+            entropy += Math.log(template.length)/Math.log(2);
+            
+            haystack = words["dirty_" + template[i] + "s"];
+            sentence[i] = exports.randomChoice(haystack);
+            entropy -= Math.log(words[template[i] + "s"].length)/Math.log(2);
+          }
+          return {
+            password: sentence.join(" "),
+            entropy: entropy
+            };
         };
 
-        exports.templateEntropy = function(template) {
-          var entropy = 0;
+        exports.templateEntropy = function(template, options) {
+          var entropy = 0
+            , haystack;
+          
+          options = parseOptions(options);
+          
           for ( var i = 0; i < template.length; i++ ) {
-            entropy += Math.log(words[template[i] + "s"].length)/Math.log(2);
+            haystack = words[template[i] + "s"];
+            if ( options.use_dirty )
+              haystack = haystack.concat(words["dirty_" + template[i] + "s"]);
+            entropy += Math.log(haystack.length)/Math.log(2);
           }
+          
           return entropy;
         };
 
         $(document).ready(function() {
           var more_entropy_progress_div = $('#more_entropy .progress div');
-          $('#generate button').click(function() {
-            var template = ['adjective', 'noun', 'verb', 'adjective', 'noun'];
-            $('#generate .password').text(exports.sentencePassword(template));
-            $('#generate .entropy').text(exports.templateEntropy(template).toFixed(1) + " bits of entropy");
 
+          $('#generate_button').click(function() {
+            var template = ['adjective', 'noun', 'verb', 'adjective', 'noun']
+              , use_dirty = $('#use_dirty').attr('checked');
+            var sentence = exports.sentencePassword(template, { use_dirty: use_dirty });
+            $('#generate .password').text(sentence.password);
+            $('#generate .entropy').text(sentence.entropy.toFixed(1) + " bits of entropy");
           });
+
+          $('#toggle_options_button').click(function() {
+            $('.toggleOptions').hide();
+            $('#options').show();
+          });
+
           $(document).mousemove(function(event) {
             var x = event.clientX
               , y = event.clientY
@@ -152,7 +209,13 @@
       <div id="generate" style="display: none;">
         <div class="password"></div>
         <div class="entropy"></div>
-        <button>Generate</button>
+        <button id="generate_button">Generate</button>
+        <div class="toggleOptions">
+          <a href="javascript:void(0);" id="toggle_options_button">Show Options</a>
+        </div>
+        <div id="options" style="display: none;">
+          <input type="checkbox" name="use_dirty" id="use_dirty" /><label for="use_dirty">Include dirty words?</label>
+        </div>
       </div>
       <div id="more_entropy">
         Move your mouse around
