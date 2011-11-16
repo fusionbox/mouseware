@@ -158,17 +158,18 @@
 
           $('#generate_button').click(function() {
             var template = ['adjective', 'noun', 'verb', 'adjective', 'noun']
-              , use_dirty = $('#use_dirty').attr('checked')
-              , use_number = $('#use_number').attr('checked')
-              , use_symbol = $('#use_symbol').attr('checked');
-            var sentence = exports.sentencePassword(template, { use_dirty: use_dirty, use_number: use_number, use_symbol: use_symbol });
+              , options_form = $('#options')[0]
+              , sentence = exports.sentencePassword(template, {
+                  use_dirty: options_form.use_dirty.checked,
+                  use_number: options_form.use_number.checked,
+                  use_symbol: options_form.use_symbol.checked});
             $('#generate .password').text(sentence.password);
             $('#generate .entropy').text(sentence.entropy.toFixed(1) + " bits of entropy");
           });
 
           $('#toggle_options_button').click(function() {
             $('.toggleOptions').hide();
-            $('#options').show();
+            $('#options').fadeIn();
           });
 
           $(document).mousemove(function(event) {
@@ -269,6 +270,30 @@
         display: block;
         opacity: 1;
       }
+
+      #options {
+        background-color: #ddd;
+        width: 300px;
+        margin: 20px auto;
+        padding: 10px;
+        border: 1px #ccc solid;
+        border-radius: 4px;
+      }
+      #options label {
+        display: block;
+        text-align: left;
+        color: #666;
+      }
+
+      .toggleOptions {
+        margin-top: 20px;
+      }
+      .toggleOptions a {
+        color: #aaa;
+        text-decoration: underline;
+        cursor: pointer;
+      }
+
     </style>
   </head>
   <body>
@@ -279,13 +304,13 @@
         <div class="entropy"></div>
         <button id="generate_button">Generate</button>
         <div class="toggleOptions">
-          <a href="javascript:void(0);" id="toggle_options_button">Show Options</a>
+          <a id="toggle_options_button">Show Options</a>
         </div>
-        <div id="options" style="display: none;">
-          <input type="checkbox" name="use_dirty" id="use_dirty" /><label for="use_dirty">Include dirty words?</label>
-          <input type="checkbox" name="use_number" id="use_number" /><label for="use_number">Include a number?</label>
-          <input type="checkbox" name="use_symbol" id="use_symbol" /><label for="use_symbol">Include a symbol?</label>
-        </div>
+        <form id="options" style="display: none;">
+          <label><input type="checkbox" name="use_dirty">Include dirty words?</label>
+          <label><input type="checkbox" name="use_number">Include a number?</label>
+          <label><input type="checkbox" name="use_symbol">Include a symbol?</label>
+        </form>
       </div>
       <div id="more_entropy">
         Move your mouse around
