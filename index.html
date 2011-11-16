@@ -12,16 +12,24 @@
           , buffer = ''
           , local_storage = typeof window.localStorage != 'undefined' ? localStorage : {};
         
+        function seedOracle(buffer) {
+          return Crypto.SHA256(buffer + 'seed');
+        }
+
+        function outputOracle(buffer) {
+          return Crypto.SHA256(buffer + 'output');
+        }
+
         if ( local_storage.random_seed ) {
           /* we've got a seed from last time, add time to it just in case...*/
-          buffer = Crypto.SHA256(localStorage.random_seed + (new Date()).valueOf());
+          buffer = seedOracle(localStorage.random_seed + (new Date()).valueOf());
           events_left = TOTAL_EVENTS = 0;
         }
 
         function updateLocalStorage() {
           if ( events_left <= 0 ) {
-            local_storage.random_seed = Crypto.SHA256(buffer);
-            buffer = Crypto.SHA256(buffer + 'a');
+            local_storage.random_seed = outputOracle(buffer);
+            buffer = seedOracle(buffer);
           }
         }
         function updateLocalStorageTimeout() {
@@ -33,8 +41,9 @@
         function random_2(bits) {
           if ( Math.ceil(bits/4) > buffer.length )
             throw new Error('Not enough bits in buffer');
-          var hex = buffer.slice(0, Math.ceil(bits/4));
-          buffer = Crypto.SHA256(buffer); // refresh the buffer
+          var output = outputOracle(buffer);
+          var hex = output.slice(0, Math.ceil(bits/4));
+          buffer = seedOracle(buffer); // refresh the buffer
           updateLocalStorage();
           return parseInt(hex, 16);
         };
@@ -209,7 +218,7 @@
               clearTimeout(reminder_timeout);
             reminder_timeout = setTimeout(show_reminder, 5000);
 
-            buffer = Crypto.SHA256(buffer + x + y + ms);
+            buffer = seedOracle(buffer + x + y + ms);
             events_left--;
             if (  events_left == 0 ) {
               $('#more_entropy').hide();
