@@ -9,13 +9,33 @@
       (function(exports, $) {
         var TOTAL_EVENTS = 500
           , events_left = TOTAL_EVENTS
-          , buffer = '';
+          , buffer = ''
+          , local_storage = typeof window.localStorage != 'undefined' ? localStorage : {};
         
+        if ( local_storage.random_seed ) {
+          /* we've got a seed from last time, add time to it just in case...*/
+          buffer = Crypto.SHA256(localStorage.random_seed + (new Date()).valueOf());
+          events_left = TOTAL_EVENTS = 0;
+        }
+
+        function updateLocalStorage() {
+          if ( events_left <= 0 ) {
+            local_storage.random_seed = Crypto.SHA256(buffer);
+            buffer = Crypto.SHA256(buffer + 'a');
+          }
+        }
+        function updateLocalStorageTimeout() {
+          updateLocalStorage()
+          setTimeout(updateLocalStorageTimeout, 5000);
+        };
+        setTimeout(updateLocalStorageTimeout, 5000);
+
         function random_2(bits) {
           if ( Math.ceil(bits/4) > buffer.length )
             throw new Error('Not enough bits in buffer');
           var hex = buffer.slice(0, Math.ceil(bits/4));
           buffer = Crypto.SHA256(buffer); // refresh the buffer
+          updateLocalStorage();
           return parseInt(hex, 16);
         };
 
@@ -154,18 +174,25 @@
           var more_entropy_progress_div = $('#more_entropy .progress div')
             , reminder_elem = $('#more_entropy .reminder')
             , show_reminder = function() { reminder_elem.addClass('visible'); }
-            , reminder_timeout = null;
+            , reminder_timeout = null
+            , generate_password = function() {
+                var template = ['adjective', 'noun', 'verb', 'adjective', 'noun']
+                  , options_form = $('#options')[0]
+                  , sentence = exports.sentencePassword(template, {
+                      use_dirty: options_form.use_dirty.checked,
+                      use_number: options_form.use_number.checked,
+                      use_symbol: options_form.use_symbol.checked});
+                $('#generate .password').text(sentence.password);
+                $('#generate .entropy').text(sentence.entropy.toFixed(1) + " bits of entropy");
+              };
 
-          $('#generate_button').click(function() {
-            var template = ['adjective', 'noun', 'verb', 'adjective', 'noun']
-              , options_form = $('#options')[0]
-              , sentence = exports.sentencePassword(template, {
-                  use_dirty: options_form.use_dirty.checked,
-                  use_number: options_form.use_number.checked,
-                  use_symbol: options_form.use_symbol.checked});
-            $('#generate .password').text(sentence.password);
-            $('#generate .entropy').text(sentence.entropy.toFixed(1) + " bits of entropy");
-          });
+          $('#generate_button').click(generate_password);
+
+          if ( events_left == 0 ) {
+            $('#more_entropy').hide();
+            $('#generate').show();
+            generate_password();
+          }
 
           $('#toggle_options_button').click(function() {
             $('.toggleOptions').hide();
@@ -187,6 +214,7 @@
             if (  events_left == 0 ) {
               $('#more_entropy').hide();
               $('#generate').show();
+              generate_password();
             }
             else if ( events_left > 0 && events_left % 10 == 0 )
             {
