@@ -9,7 +9,7 @@
       (function(exports, $) {
         var TOTAL_EVENTS = 500
           , events_left = TOTAL_EVENTS
-          , buffer = ''
+          , buffer = '';
         
         function random_2(bits) {
           if ( Math.ceil(bits/4) > buffer.length )
@@ -21,7 +21,9 @@
 
         function parseOptions(options) {
           return jQuery.extend({
-              use_dirty: false
+              use_dirty: false,
+              use_number: false,
+              use_symbol: false
             }, options);
         };
 
@@ -82,10 +84,54 @@
             sentence[i] = exports.randomChoice(haystack);
             entropy -= Math.log(words[template[i] + "s"].length)/Math.log(2);
           }
-          return {
+
+          var ret = {
             password: sentence.join(" "),
             entropy: entropy
             };
+          if ( options.use_number )
+          {
+            var new_password = exports.addReplacement({
+                'a': '4',
+                'e': '3',
+                'i': '1',
+                'o': '0',
+                }, /[aeio]/g, ret.password);
+            ret.password = new_password.password;
+            ret.entropy += new_password.entropy;
+          }
+          if ( options.use_symbol )
+          {
+            var new_password = exports.addReplacement({
+                'a': '/-\\',
+                'b': '|3',
+                'c': '(',
+                'h': '|-|',
+                'k': '|<',
+                'l': '|',
+                't': '+',
+                'v': '\\/',
+                'x': '%'
+                }, /[abchkltvx]/g, ret.password);
+            ret.password = new_password.password;
+            ret.entropy += new_password.entropy;
+          }
+          return ret;
+        };
+        
+        exports.addReplacement = function(replacements, replaceable, string) {
+          var chars = string.split('');
+          var index;
+
+          do {
+            index = exports.random(chars.length);
+          } while ( ! chars[index].match(replaceable) )
+
+          chars[index] = replacements[chars[index]];
+          return {
+            password: chars.join(''),
+            entropy: Math.log(string.match(replaceable).length)/Math.log(2)
+          };
         };
 
         exports.templateEntropy = function(template, options) {
@@ -112,8 +158,10 @@
 
           $('#generate_button').click(function() {
             var template = ['adjective', 'noun', 'verb', 'adjective', 'noun']
-              , use_dirty = $('#use_dirty').attr('checked');
-            var sentence = exports.sentencePassword(template, { use_dirty: use_dirty });
+              , use_dirty = $('#use_dirty').attr('checked')
+              , use_number = $('#use_number').attr('checked')
+              , use_symbol = $('#use_symbol').attr('checked');
+            var sentence = exports.sentencePassword(template, { use_dirty: use_dirty, use_number: use_number, use_symbol: use_symbol });
             $('#generate .password').text(sentence.password);
             $('#generate .entropy').text(sentence.entropy.toFixed(1) + " bits of entropy");
           });
@@ -235,6 +283,8 @@
         </div>
         <div id="options" style="display: none;">
           <input type="checkbox" name="use_dirty" id="use_dirty" /><label for="use_dirty">Include dirty words?</label>
+          <input type="checkbox" name="use_number" id="use_number" /><label for="use_number">Include a number?</label>
+          <input type="checkbox" name="use_symbol" id="use_symbol" /><label for="use_symbol">Include a symbol?</label>
         </div>
       </div>
       <div id="more_entropy">
