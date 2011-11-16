@@ -1,5 +1,14 @@
 var words = {};
 
+words.dirty_adjectives = [
+  'crappy',
+  'shitty',
+  'fucking',
+  'goddamn',
+  'dickless',
+  'pissy'
+];
+
 words.adjectives = [
   'abundant',
   'adorable',
@@ -424,9 +433,17 @@ words.adjectives = [
   'zealous'
 ];
 
+words.dirty_articles = [
+  'goddamn'
+];
+
 words.articles = [
   'a',
   'the'
+];
+
+words.dirty_nouns = [
+  'penis'
 ];
 
 words.nouns = [
@@ -2832,6 +2849,9 @@ words.nouns = [
   'zoology'
 ];
 
+words.dirty_prepositions = [
+];
+
 words.prepositions = [
   'aboard',
   'about',
@@ -2903,6 +2923,10 @@ words.prepositions = [
   'with',
   'within',
   'without'
+];
+
+words.dirty_verbs = [
+  'fucked'
 ];
 
 words.verbs = [
