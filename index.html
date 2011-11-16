@@ -105,7 +105,10 @@
         };
 
         $(document).ready(function() {
-          var more_entropy_progress_div = $('#more_entropy .progress div');
+          var more_entropy_progress_div = $('#more_entropy .progress div')
+            , reminder_elem = $('#more_entropy .reminder')
+            , show_reminder = function() { reminder_elem.addClass('visible'); }
+            , reminder_timeout = null;
 
           $('#generate_button').click(function() {
             var template = ['adjective', 'noun', 'verb', 'adjective', 'noun']
@@ -124,6 +127,12 @@
             var x = event.clientX
               , y = event.clientY
               , ms = event.timeStamp;
+
+            reminder_elem.removeClass('visible');
+            if ( reminder_timeout )
+              clearTimeout(reminder_timeout);
+            reminder_timeout = setTimeout(show_reminder, 5000);
+
             buffer = Crypto.SHA256(buffer + x + y + ms);
             events_left--;
             if (  events_left == 0 ) {
@@ -201,6 +210,17 @@
         background-image: -moz-linear-gradient(center bottom, #36a305 1%, #56C325 100%);
         -moz-box-shadow: 0px 1px 2px #aaaaaa; -webkit-box-shadow: 0px 1px 2px #aaaaaa; box-shadow: 0px 1px 2px #aaaaaa;
       }
+
+      .reminder {
+        color: grey;
+        opacity: 0;
+        -webkit-transition-duration: 1s;
+        -webkit-transition-property: opacity;
+      }
+      .reminder.visible {
+        display: block;
+        opacity: 1;
+      }
     </style>
   </head>
   <body>
@@ -221,6 +241,9 @@
         Move your mouse around
         <div class="progress">
           <div style="width: 0"></div>
+        </div>
+        <div class="reminder">
+          Um, you're not quite done moving your mouse yet.
         </div>
       </div>
     </div>
