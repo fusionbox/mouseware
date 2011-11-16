@@ -125,32 +125,39 @@
                 'e': '3',
                 'i': '1',
                 'o': '0',
-                }, /[aeio]/g, ret.password);
+                'q': '9',
+                's': '5',
+                't': '7',
+                'z': '2'
+                }, ret.password);
             ret.password = new_password.password;
             ret.entropy += new_password.entropy;
           }
           if ( options.use_symbol )
           {
             var new_password = exports.addReplacement({
-                'a': '/-\\',
+                'a': '@',
                 'b': '|3',
                 'c': '(',
                 'h': '|-|',
+                'i': '!',
                 'k': '|<',
                 'l': '|',
                 't': '+',
                 'v': '\\/',
+                's': '$',
                 'x': '%'
-                }, /[abchkltvx]/g, ret.password);
+                }, ret.password);
             ret.password = new_password.password;
             ret.entropy += new_password.entropy;
           }
           return ret;
         };
         
-        exports.addReplacement = function(replacements, replaceable, string) {
-          var chars = string.split('');
-          var index;
+        exports.addReplacement = function(replacements, string) {
+          var chars = string.split('')
+            , index
+            , replaceable = new RegExp('[' + Object.keys(replacements) + ']', 'g');
 
           do {
             index = exports.random(chars.length);
