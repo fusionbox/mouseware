@@ -68,7 +68,6 @@ cool
 cooperative
 courageous
 crazy
-crazy, flipped-out
 creepy
 crooked
 crowded
@@ -136,6 +135,7 @@ firm
 flaky
 flat
 fleshy
+flipped-out
 fluffy
 fluttering
 foolish

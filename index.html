@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html manifest="cache.manifest">
   <head>
-    <title>Password generator</title>
+    <title>Mouseware Secure Password Generator</title>
     <script src="js/crypto-sha256.js"></script>
     <script src="js/wordlist.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js"></script>
@@ -261,6 +261,12 @@
       body {
         width: 100%;
         font-family: "Open Sans";
+        padding: 0;
+        margin: 0;
+      }
+      html {
+        padding: 0;
+        margin: 0;
       }
 
       #container {
@@ -317,7 +323,7 @@
 
       #options {
         background-color: #ddd;
-        width: 300px;
+        max-width: 300px;
         margin: 20px auto;
         padding: 10px;
         border: 1px #ccc solid;
@@ -338,6 +344,28 @@
         cursor: pointer;
       }
 
+      p {
+        max-width: 40em;
+        margin: 100px auto;
+        text-align: left;
+        color: #555;
+      }
+      a {
+        color: #18c;
+      }
+      a:visited {
+        color: #6e9cb6;
+      }
+
+      footer {
+        position: absolute;
+        display: block;
+        width: 100%;
+        bottom: 0px;
+        left: 0px;
+        text-align: center;
+        padding-bottom: 5px;
+      }
     </style>
   </head>
   <body>
@@ -365,6 +393,16 @@
           Um, you're not quite done moving your mouse yet.
         </div>
       </div>
+      <p>
+Mouseware uses a cryptographically secure random number generator based on your mouse movements
+to generate secure, memorable passwords. The passwords are generated entirely in the browser,
+no data is ever sent over the network. The generated passphrases are similar to those generated
+by <a href="http://world.std.com/~reinhold/diceware.html">Diceware</a> or popularized by 
+<a href="http://xkcd.com/936/">xkcd</a>, with an emphasis an easy memorization.
+      </p>
     </div>
+    <footer>
+      <a href="http://www.fusionbox.com/"><img alt="fusionbox" src="fusionbox.gif"></a>
+    </footer>
   </body>
 </html>
