@@ -1,5 +1,4 @@
 aardvark
-abyssinian
 accelerator
 accordion
 account
@@ -226,8 +225,10 @@ bird
 birds
 birth
 birthday
+biscuit
 bit
 bite
+bitmap
 black
 bladder
 blade
@@ -459,7 +460,6 @@ clipper
 cloakroom
 clock
 clocks
-close
 closet
 cloth
 cloud
@@ -652,7 +652,6 @@ dietician
 difference
 digestion
 digger
-digital
 dill
 dime
 dimple
@@ -903,6 +902,7 @@ frost
 frown
 fruit
 fuel
+funeral
 fur
 furniture
 galley
@@ -1088,6 +1088,7 @@ icon
 idea
 ikebana
 illegal
+imaginary
 imprisonment
 improvement
 impulse
@@ -2014,6 +2015,7 @@ squirrel
 stage
 staircase
 stamp
+staple
 star
 start
 starter
