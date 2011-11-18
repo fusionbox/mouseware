@@ -159,7 +159,7 @@
                 $('#generate .password').text(sentence.password);
                 
                 var entropy = sentence.entropy.toFixed(1)
-                  , possibles = Math.pow(2, sentence.entropy)
+                  , possibles = Math.pow(2, sentence.entropy - 1) // on average, only half the possibilities will be needed.  so -1 exponent
                   , small_guesses_per_year = 1000 * 3600*24*365
                   , large_guesses_per_year = 100000000 * 3600*24*365;
                 $('#generate .entropy').html(entropy + " bits of entropy.<br />" + 
