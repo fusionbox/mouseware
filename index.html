@@ -53,11 +53,17 @@
           if ( options.use_dirty )
           {
             // choose a random word to replace with a dirty word
-            i = random.random(template.length);
-            entropy += Math.log(template.length)/Math.log(2);
+            // note: not all parts of speech have dirty equivalents
+            do
+            {
+              i = random.random(template.length);
+            } while ( ! words["dirty_" + template[i] + "s"]
+                      || words["dirty_" + template[i] + "s"].length == 0 )
             
             haystack = words["dirty_" + template[i] + "s"];
             sentence[i] = random.choice(haystack);
+            
+            entropy += Math.log(template.length)/Math.log(2);
             entropy -= Math.log(words[template[i] + "s"].length)/Math.log(2);
           }
 
@@ -140,13 +146,25 @@
             , reminder_timeout = null
             , generate_password = function() {
                 var template = ['adjective', 'noun', 'verb', 'adjective', 'noun']
-                  , options_form = $('#options')[0]
-                  , sentence = exports.sentencePassword(template, {
+                  , options_form = $('#options')[0];
+                
+                if ( options_form.use_more_words.checked )
+                  template = ['article', 'adjective', 'noun', 'verb', 'article', 'adjective', 'noun']
+                
+                var sentence = exports.sentencePassword(template, {
                       use_dirty: options_form.use_dirty.checked,
                       use_number: options_form.use_number.checked,
                       use_symbol: options_form.use_symbol.checked});
+                
                 $('#generate .password').text(sentence.password);
-                $('#generate .entropy').text(sentence.entropy.toFixed(1) + " bits of entropy");
+                
+                var entropy = sentence.entropy.toFixed(1)
+                  , possibles = Math.pow(2, sentence.entropy)
+                  , small_guesses_per_year = 1000 * 3600*24*365
+                  , large_guesses_per_year = 100000000 * 3600*24*365;
+                $('#generate .entropy').html(entropy + " bits of entropy.<br />" + 
+                                          (possibles / small_guesses_per_year).toFixed(1) + " years to guess at 1000 guesses/second.<br />" +
+                                          (possibles / large_guesses_per_year).toFixed(1) + " years to guess at 100 billion guesses/second.");
               };
 
           $('#generate_button').click(generate_password);
@@ -342,6 +360,7 @@
           <label><input type="checkbox" name="use_dirty">Include dirty words?</label>
           <label><input type="checkbox" name="use_number">Include a number?</label>
           <label><input type="checkbox" name="use_symbol">Include a symbol?</label>
+          <label><input type="checkbox" name="use_more_words">Include more words?</label>
         </form>
       </div>
       <div id="more_entropy">
