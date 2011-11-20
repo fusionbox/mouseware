@@ -163,8 +163,8 @@
                   , small_guesses_per_year = 1000 * 3600*24*365
                   , large_guesses_per_year = 100000000 * 3600*24*365;
                 $('#generate .entropy').html(entropy + " bits of entropy.<br />" + 
-                                          (possibles / small_guesses_per_year).toFixed(1) + " years to guess at 1000 guesses/second.<br />" +
-                                          (possibles / large_guesses_per_year).toFixed(1) + " years to guess at 100 billion guesses/second.");
+                    (possibles / small_guesses_per_year).toFixed(1) + " years to guess at 1000 guesses/second.<a href='#online'>[1]</a><br />" +
+                    (possibles / large_guesses_per_year).toFixed(1) + " years to guess at 100 billion guesses/second.<a href='#offline'>[2]</a>");
               };
 
           $('#generate_button').click(generate_password);
@@ -280,6 +280,10 @@
         opacity: 0;
         -webkit-transition-duration: 1s;
         -webkit-transition-property: opacity;
+        -moz-transition-duration: 1s;
+        -moz-transition-property: opacity;
+        transition-duration: 1s;
+        transition-property: opacity;
       }
       .reminder.visible {
         display: block;
@@ -308,10 +312,13 @@
         text-decoration: underline;
         cursor: pointer;
       }
+      #generate {
+        margin-bottom: 100px 
+      }
 
       p {
         max-width: 40em;
-        margin: 100px auto;
+        margin: 25px auto;
         text-align: left;
         color: #555;
       }
@@ -330,6 +337,27 @@
         left: 0px;
         text-align: center;
         padding-bottom: 5px;
+      }
+
+      @-webkit-keyframes flash {
+        50% { color: black; }
+      }
+      @-moz-keyframes flash {
+        50% { color: black; }
+      }
+      @keyframes flash {
+        50% { color: black; }
+      }
+      p:target {
+        -webkit-animation: flash 1s 2;
+        -moz-animation: flash 1s 2;
+      }
+      p:target sup {
+        color: black;
+      }
+      .entropy a {
+        vertical-align: super;
+        font-size: .75em;
       }
     </style>
     <script type="text/javascript">//<![CDATA[
@@ -378,6 +406,12 @@ to generate secure, memorable passwords. Passwords are generated entirely in the
 no data is ever sent over the network. The generated passphrases are similar to those generated
 by <a href="http://world.std.com/~reinhold/diceware.html">Diceware</a> or popularized by 
 <a href="http://xkcd.com/936/">xkcd</a>, with an emphasis on easy memorization.
+      </p>
+      <p id="online">
+      <sup>[1]</sup>1000 guesses/second is a worst-case web-based attack. Typically this is the only type of attack feasible against a secure website.
+      </p>
+      <p id="offline">
+      <sup>[2]</sup>100 billion guesses/second is a worst-case offline attack, when a hashed password database is stolen by someone with nontrivial technical and financial resources.
       </p>
     </div>
     <footer>
