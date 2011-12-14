@@ -15,37 +15,32 @@
           events_left = 0;
     
         function parseOptions(options) {
-          return jQuery.extend({
-             use_dirty: false,
-             use_number: false,
-             use_symbol: false
-             }, options);
+          return $.extend({
+              use_dirty: false
+            , use_number: false
+            , use_symbol: false
+            }, options);
           };
- 
-        exports.randomPassword = function(n) {
-          var password = ''
-            , charlist = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`-=~!@#$%^&*()_+[]\{}|;:",./<>?'.split('');
-          while ( n-- ) {
-            password += random.randomChoice(charlist);
-          }
-          return password;
-        };
 
         exports.sentencePassword = function(template, options) {
           var entropy = 0
             , sentence = []
-            , haystack,
-            i;
+            , haystack
+            , token
+            , i;
           
           options = parseOptions(options);
           
           for ( i = 0; i < template.length; i++ ) {
-            if ( ! words[template[i] + "s"] )
-              throw new Error('Unknown token "' + template[i] + '"');
+            token = template[i];
+            haystack = words[token];
+
+            if ( ! haystack )
+              throw new Error('Unknown token "' + token + '"');
             
-            haystack = words[template[i] + "s"];
             if ( options.use_dirty )
-              haystack = haystack.concat(words["dirty_" + template[i] + "s"]);
+              haystack = haystack.concat(words["dirty_" + token]);
+
             sentence.push(random.choice(haystack));
             entropy += Math.log(haystack.length)/Math.log(2);
           }
@@ -57,50 +52,51 @@
             do
             {
               i = random.random(template.length);
-            } while ( ! words["dirty_" + template[i] + "s"]
-                      || words["dirty_" + template[i] + "s"].length == 0 )
+              token = template[i];
+              haystack = words["dirty_" + token];
+            } while ( ! haystack
+                      || haystack.length == 0 )
             
-            haystack = words["dirty_" + template[i] + "s"];
             sentence[i] = random.choice(haystack);
             
             entropy += Math.log(template.length)/Math.log(2);
-            entropy -= Math.log(words[template[i] + "s"].length)/Math.log(2);
+            entropy -= Math.log(words[token].length)/Math.log(2);
           }
 
           var ret = {
-            password: sentence.join(" "),
-            entropy: entropy
-            };
+            password: sentence.join(" ")
+          , entropy: entropy
+          };
           if ( options.use_number )
           {
             var new_password = exports.addReplacement({
-                'a': '4',
-                'e': '3',
-                'i': '1',
-                'o': '0',
-                'q': '9',
-                's': '5',
-                't': '7',
-                'z': '2'
-                }, ret.password);
+              'a': '4',
+              'e': '3',
+              'i': '1',
+              'o': '0',
+              'q': '9',
+              's': '5',
+              't': '7',
+              'z': '2'
+              }, ret.password);
             ret.password = new_password.password;
             ret.entropy += new_password.entropy;
           }
           if ( options.use_symbol )
           {
             var new_password = exports.addReplacement({
-                'a': '@',
-                'b': '|3',
-                'c': '(',
-                'h': '|-|',
-                'i': '!',
-                'k': '|<',
-                'l': '|',
-                't': '+',
-                'v': '\\/',
-                's': '$',
-                'x': '%'
-                }, ret.password);
+              'a': '@',
+              'b': '|3',
+              'c': '(',
+              'h': '|-|',
+              'i': '!',
+              'k': '|<',
+              'l': '|',
+              't': '+',
+              'v': '\\/',
+              's': '$',
+              'x': '%'
+              }, ret.password);
             ret.password = new_password.password;
             ret.entropy += new_password.entropy;
           }
@@ -109,17 +105,17 @@
         
         exports.addReplacement = function(replacements, string) {
           var chars = string.split('')
-            , index
+            , i
             , replaceable = new RegExp('[' + Object.keys(replacements) + ']', 'g');
 
           do {
-            index = random.random(chars.length);
-          } while ( ! chars[index].match(replaceable) )
+            i = random.random(chars.length);
+          } while ( ! chars[i].match(replaceable) )
 
-          chars[index] = replacements[chars[index]];
+          chars[i] = replacements[chars[i]];
           return {
-            password: chars.join(''),
-            entropy: Math.log(string.match(replaceable).length)/Math.log(2)
+            password: chars.join('')
+          , entropy: Math.log(string.match(replaceable).length)/Math.log(2)
           };
         };
 
@@ -130,9 +126,9 @@
           options = parseOptions(options);
           
           for ( var i = 0; i < template.length; i++ ) {
-            haystack = words[template[i] + "s"];
+            haystack = words[template[i]];
             if ( options.use_dirty )
-              haystack = haystack.concat(words["dirty_" + template[i] + "s"]);
+              haystack = haystack.concat(words["dirty_" + template[i]]);
             entropy += Math.log(haystack.length)/Math.log(2);
           }
           
@@ -149,12 +145,13 @@
                   , options_form = $('#options')[0];
                 
                 if ( options_form.use_more_words.checked )
-                  template = ['article', 'adjective', 'noun', 'verb', 'article', 'adjective', 'noun']
+                  template = ['article', 'adjective', 'noun', 'verb', 'article', 'adjective', 'noun'];
                 
                 var sentence = exports.sentencePassword(template, {
-                      use_dirty: options_form.use_dirty.checked,
-                      use_number: options_form.use_number.checked,
-                      use_symbol: options_form.use_symbol.checked});
+                  use_dirty: options_form.use_dirty.checked
+                , use_number: options_form.use_number.checked
+                , use_symbol: options_form.use_symbol.checked
+                });
                 
                 $('#generate .password').text(sentence.password);
                 
@@ -162,9 +159,10 @@
                   , possibles = Math.pow(2, sentence.entropy - 1) // on average, only half the possibilities will be needed.  so -1 exponent
                   , small_guesses_per_year = 1000 * 3600*24*365
                   , large_guesses_per_year = 100000000 * 3600*24*365;
+
                 $('#generate .entropy').html(entropy + " bits of entropy.<br />" + 
-                    (possibles / small_guesses_per_year).toFixed(1) + " years to guess at 1000 guesses/second.<a href='#online'>[1]</a><br />" +
-                    (possibles / large_guesses_per_year).toFixed(1) + " years to guess at 100 billion guesses/second.<a href='#offline'>[2]</a>");
+                  (possibles / small_guesses_per_year).toFixed(1) + " years to guess at 1000 guesses/second.<a href='#online'>[1]</a><br />" +
+                  (possibles / large_guesses_per_year).toFixed(1) + " years to guess at 100 billion guesses/second.<a href='#offline'>[2]</a>");
               };
 
           $('#generate_button').click(generate_password);
@@ -205,7 +203,7 @@
         });
       })(window, jQuery);
     </script>
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:700,400' rel='stylesheet' type='text/css'>
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans:700,400" rel="stylesheet" type="text/css">
     <style>
       .progress {
         width: 300px;
@@ -330,11 +328,12 @@
       }
 
       footer {
-        position: absolute;
+        position: fixed;
+        backgrond-color: white;
         display: block;
         width: 100%;
-        bottom: 0px;
-        left: 0px;
+        bottom: 0;
+        left: 0;
         text-align: center;
         padding-bottom: 5px;
       }
