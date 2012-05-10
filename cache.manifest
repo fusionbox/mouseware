@@ -4,14 +4,13 @@ js/crypto-sha256.js
 js/wordlist.js
 js/random.js
 fusionbox.gif
-http://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js
+forkme_ribbon.png
+js/jquery.min.js
 http://fonts.googleapis.com/css?family=Open+Sans:700,400
-http://themes.googleusercontent.com/static/fonts/opensans/v5/cJZKeOuBrn4kERxqtaUH3T8E0i7KZn-EPnyo3HZu7kw.woff
-http://themes.googleusercontent.com/static/fonts/opensans/v5/k3k702ZOKiLJc3WVjuplzHhCUOGz7vYGh680lGh-uXM.woff
-http://themes.googleusercontent.com/static/fonts/opensans/v5/k3k702ZOKiLJc3WVjuplzInF5uFdDttMLvmWuJdhhgs.ttf
-http://themes.googleusercontent.com/static/fonts/opensans/v5/cJZKeOuBrn4kERxqtaUH3aCWcynf_cDxXwCLxiixG1c.ttf
 http://www.google-analytics.com/ga.js
-https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png
+http://themes.googleusercontent.com/static/fonts/opensans/v6/cJZKeOuBrn4kERxqtaUH3T8E0i7KZn-EPnyo3HZu7kw.woff
+http://themes.googleusercontent.com/static/fonts/opensans/v6/k3k702ZOKiLJc3WVjuplzHhCUOGz7vYGh680lGh-uXM.woff
 
 NETWORK:
 http://www.google-analytics.com/__utm.gif
+http://themes.googleusercontent.com/static/fonts/*
