@@ -46,7 +46,7 @@ for file in glob.glob(src):
         words[place] = list(set([i.strip() for i in f]))
 
 sentence = []
-construct = ['adjectives', 'nouns', 'verbs', 'adjectives', 'nouns']
+construct = ['adjective', 'noun', 'verb', 'adjective', 'noun']
 for place in construct:
     sentence.append(random.choice(words[place]))
 
