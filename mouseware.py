@@ -17,6 +17,7 @@ for file in glob.glob(src):
         words[place] = list(set([i.strip() for i in f]))
 
 if '--more' in sys.argv:
+    sys.argv.remove('--more')
     construct = ['article', 'adjective', 'noun', 'verb', 'article', 'adjective', 'noun']
 else:
     construct = ['adjective', 'noun', 'verb', 'adjective', 'noun']
@@ -27,6 +28,7 @@ for place in construct:
 
 # todo: --number
 if '--number' in sys.argv:
+    sys.argv.remove('--number')
     sys.stderr.write('--number not done yet...\n')
     # 'a': '4',
     # 'e': '3',
@@ -39,6 +41,7 @@ if '--number' in sys.argv:
 
 # todo: --symbol
 if '--symbol' in sys.argv:
+    sys.argv.remove('--symbol')
     sys.stderr.write('--symbol not done yet...\n')
     # 'a': '@',
     # 'b': '|3',
@@ -53,11 +56,15 @@ if '--symbol' in sys.argv:
     # 'x': '%'
 
 if '--dirty' in sys.argv:
+    sys.argv.remove('--dirty')
     dirty = None
     while dirty not in ['dirty_adjective', 'dirty_noun', 'dirty_verb']:
         dirty_index = random.randrange(len(construct))
         dirty = 'dirty_' + construct[dirty_index]
     dirty = random.choice(words[dirty])
     sentence[dirty_index] = dirty
+
+if len(sys.argv) > 1:
+    sys.stderr.write("Unknown options: {0}\n".format(', '.join(sys.argv[1:])))
 
 sys.stdout.write(' '.join(sentence) + "\n")
