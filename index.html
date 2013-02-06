@@ -179,7 +179,6 @@
           });
 
           var add_entropy = function(x, y, ms) {
-            console.log(x, y, ms);
             reminder_elem.removeClass('visible');
             if ( reminder_timeout )
               clearTimeout(reminder_timeout);
@@ -201,6 +200,12 @@
           $(document).on('mousemove', function(event) {
             add_entropy(event.clientX, event.clientY, event.timeStamp);
           }).on('touchmove', function(event) {
+            if ( !random.ready() && navigator.userAgent.match(/android/i) ) {
+              // android only fires a single touchmove unless preventDefault.
+              // this makes the initial entropy collection faster without messing up
+              // drags later.
+              event.preventDefault();
+            }
             event = event.originalEvent;
             add_entropy(event.touches[0].clientX, event.touches[0].clientY, event.timeStamp);
           });
