@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html manifest="cache.manifest">
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mouseware Secure Password Generator</title>
     <script src="js/crypto-sha256.js"></script>
     <script src="js/random.js"></script>
@@ -347,6 +348,13 @@
         padding-bottom: 5px;
       }
 
+      footer .code {
+        padding-bottom: 5px;
+        font-size: .75em;
+        /* hidden unless on a narrow screen */
+        display: none;
+      }
+
       @-webkit-keyframes flash {
         50% { color: black; }
       }
@@ -367,6 +375,28 @@
         vertical-align: super;
         font-size: .75em;
       }
+
+      .forkme img {
+        position: absolute;
+        top: 0;
+        right: 0;
+        border: 0;
+      }
+
+      @media screen and (max-width: 800px) {
+        .forkme {
+          display: none;
+        }
+        footer .code {
+          display: block;
+        }
+      }
+
+      @media screen and (max-height: 693px) {
+        footer {
+          position: relative;
+        }
+      }
     </style>
     <script type="text/javascript">//<![CDATA[
 
@@ -383,7 +413,7 @@
     </script>
   </head>
   <body>
-    <a href="http://github.com/fusionbox/mouseware/"><img style="position: absolute; top: 0; right: 0; border: 0;" src="forkme_ribbon.png" alt="Fork me on GitHub"></a>
+    <a class="forkme" href="http://github.com/fusionbox/mouseware/"><img style="" src="forkme_ribbon.png" alt="Fork me on GitHub"></a>
     <div id="container">
       <div id="generate" style="display: none;">
         <div class="password"></div>
@@ -423,6 +453,7 @@ by <a href="http://world.std.com/~reinhold/diceware.html">Diceware</a> or popula
       </p>
     </div>
     <footer>
+      <a class="code" href="http://github.com/fusionbox/mouseware/">source code</a>
       <a href="http://www.fusionbox.com/"><img alt="fusionbox" src="fusionbox.gif"></a>
     </footer>
   </body>
