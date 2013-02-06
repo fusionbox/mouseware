@@ -1,156 +1,121 @@
 <!DOCTYPE html>
 <html manifest="cache.manifest">
   <head>
-    <title>Password generator</title>
+    <title>Mouseware Secure Password Generator</title>
     <script src="js/crypto-sha256.js"></script>
+    <script src="js/random.js"></script>
     <script src="js/wordlist.js"></script>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js"></script>
+    <script src="js/jquery.min.js"></script>
     <script type="text/javascript">
       (function(exports, $) {
         var TOTAL_EVENTS = 500
-          , events_left = TOTAL_EVENTS
-          , buffer = ''
-          , local_storage = typeof window.localStorage != 'undefined' ? localStorage : {};
-        
-        if ( local_storage.random_seed ) {
-          /* we've got a seed from last time, add time to it just in case...*/
-          buffer = Crypto.SHA256(localStorage.random_seed + (new Date()).valueOf());
-          events_left = TOTAL_EVENTS = 0;
-        }
-
-        function updateLocalStorage() {
-          if ( events_left <= 0 ) {
-            local_storage.random_seed = Crypto.SHA256(buffer);
-            buffer = Crypto.SHA256(buffer + 'a');
-          }
-        }
-        function updateLocalStorageTimeout() {
-          updateLocalStorage()
-          setTimeout(updateLocalStorageTimeout, 5000);
-        };
-        setTimeout(updateLocalStorageTimeout, 5000);
-
-        function random_2(bits) {
-          if ( Math.ceil(bits/4) > buffer.length )
-            throw new Error('Not enough bits in buffer');
-          var hex = buffer.slice(0, Math.ceil(bits/4));
-          buffer = Crypto.SHA256(buffer); // refresh the buffer
-          updateLocalStorage();
-          return parseInt(hex, 16);
-        };
-
+          , events_left = TOTAL_EVENTS;
+ 
+        if ( random.ready() )
+          events_left = 0;
+    
         function parseOptions(options) {
-          return jQuery.extend({
-              use_dirty: false,
-              use_number: false,
-              use_symbol: false
+          return $.extend({
+              use_dirty: false
+            , use_number: false
+            , use_symbol: false
             }, options);
-        };
-
-        exports.random = function(max) {
-          if ( max <= 1 )
-            throw new Error('random() expects a max greater than 1');
-          var bits = Math.ceil(Math.log(max)/Math.log(2))
-            , n;
-
-          do {
-            n = random_2(bits);
-          } while ( n >= max );
-          return n;
-        };
-
-        exports.randomChoice = function(ary) {
-          if ( ary.length == 0 )  return void(0);
-          if ( ary.length == 1 )  return ary[0];
-          var index = exports.random(ary.length);
-          return ary[index];
-        };
-
-        exports.randomPassword = function(n) {
-          var password = ''
-            , charlist = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789`-=~!@#$%^&*()_+[]\{}|;:",./<>?'.split('');
-          while ( n-- ) {
-            password += exports.randomChoice(charlist);
-          }
-          return password;
-        };
+          };
 
         exports.sentencePassword = function(template, options) {
           var entropy = 0
             , sentence = []
-            , haystack,
-            i;
+            , haystack
+            , token
+            , i;
           
           options = parseOptions(options);
           
           for ( i = 0; i < template.length; i++ ) {
-            if ( ! words[template[i] + "s"] )
-              throw new Error('Unknown token "' + template[i] + '"');
+            token = template[i];
+            haystack = words[token];
+
+            if ( ! haystack )
+              throw new Error('Unknown token "' + token + '"');
             
-            haystack = words[template[i] + "s"];
             if ( options.use_dirty )
-              haystack = haystack.concat(words["dirty_" + template[i] + "s"]);
-            sentence.push(exports.randomChoice(haystack));
+              haystack = haystack.concat(words["dirty_" + token]);
+
+            sentence.push(random.choice(haystack));
             entropy += Math.log(haystack.length)/Math.log(2);
           }
           
           if ( options.use_dirty )
           {
             // choose a random word to replace with a dirty word
-            i = exports.random(template.length);
-            entropy += Math.log(template.length)/Math.log(2);
+            // note: not all parts of speech have dirty equivalents
+            do
+            {
+              i = random.random(template.length);
+              token = template[i];
+              haystack = words["dirty_" + token];
+            } while ( ! haystack
+                      || haystack.length == 0 )
             
-            haystack = words["dirty_" + template[i] + "s"];
-            sentence[i] = exports.randomChoice(haystack);
-            entropy -= Math.log(words[template[i] + "s"].length)/Math.log(2);
+            sentence[i] = random.choice(haystack);
+            
+            entropy += Math.log(template.length)/Math.log(2);
+            entropy -= Math.log(words[token].length)/Math.log(2);
           }
 
           var ret = {
-            password: sentence.join(" "),
-            entropy: entropy
-            };
+            password: sentence.join(" ")
+          , entropy: entropy
+          };
           if ( options.use_number )
           {
             var new_password = exports.addReplacement({
-                'a': '4',
-                'e': '3',
-                'i': '1',
-                'o': '0',
-                }, /[aeio]/g, ret.password);
+              'a': '4',
+              'e': '3',
+              'i': '1',
+              'o': '0',
+              'q': '9',
+              's': '5',
+              't': '7',
+              'z': '2'
+              }, ret.password);
             ret.password = new_password.password;
             ret.entropy += new_password.entropy;
           }
           if ( options.use_symbol )
           {
             var new_password = exports.addReplacement({
-                'a': '/-\\',
-                'b': '|3',
-                'c': '(',
-                'h': '|-|',
-                'k': '|<',
-                'l': '|',
-                't': '+',
-                'v': '\\/',
-                'x': '%'
-                }, /[abchkltvx]/g, ret.password);
+              'a': '@',
+              'b': '|3',
+              'c': '(',
+              'h': '|-|',
+              'i': '!',
+              'k': '|<',
+              'l': '|',
+              't': '+',
+              'v': '\\/',
+              's': '$',
+              'x': '%'
+              }, ret.password);
             ret.password = new_password.password;
             ret.entropy += new_password.entropy;
           }
           return ret;
         };
         
-        exports.addReplacement = function(replacements, replaceable, string) {
-          var chars = string.split('');
-          var index;
+        exports.addReplacement = function(replacements, string) {
+          var chars = string.split('')
+            , i
+            , replaceable = new RegExp('[' + Object.keys(replacements) + ']', 'g');
 
           do {
-            index = exports.random(chars.length);
-          } while ( ! chars[index].match(replaceable) )
+            i = random.random(chars.length);
+          } while ( ! chars[i].match(replaceable) )
 
-          chars[index] = replacements[chars[index]];
+          chars[i] = replacements[chars[i]];
           return {
-            password: chars.join(''),
-            entropy: Math.log(string.match(replaceable).length)/Math.log(2)
+            password: chars.join('')
+          , entropy: Math.log(string.match(replaceable).length)/Math.log(2)
           };
         };
 
@@ -161,9 +126,9 @@
           options = parseOptions(options);
           
           for ( var i = 0; i < template.length; i++ ) {
-            haystack = words[template[i] + "s"];
+            haystack = words[template[i]];
             if ( options.use_dirty )
-              haystack = haystack.concat(words["dirty_" + template[i] + "s"]);
+              haystack = haystack.concat(words["dirty_" + template[i]]);
             entropy += Math.log(haystack.length)/Math.log(2);
           }
           
@@ -177,13 +142,27 @@
             , reminder_timeout = null
             , generate_password = function() {
                 var template = ['adjective', 'noun', 'verb', 'adjective', 'noun']
-                  , options_form = $('#options')[0]
-                  , sentence = exports.sentencePassword(template, {
-                      use_dirty: options_form.use_dirty.checked,
-                      use_number: options_form.use_number.checked,
-                      use_symbol: options_form.use_symbol.checked});
+                  , options_form = $('#options')[0];
+                
+                if ( options_form.use_more_words.checked )
+                  template = ['article', 'adjective', 'noun', 'verb', 'article', 'adjective', 'noun'];
+                
+                var sentence = exports.sentencePassword(template, {
+                  use_dirty: options_form.use_dirty.checked
+                , use_number: options_form.use_number.checked
+                , use_symbol: options_form.use_symbol.checked
+                });
+                
                 $('#generate .password').text(sentence.password);
-                $('#generate .entropy').text(sentence.entropy.toFixed(1) + " bits of entropy");
+                
+                var entropy = sentence.entropy.toFixed(1)
+                  , possibles = Math.pow(2, sentence.entropy - 1) // on average, only half the possibilities will be needed.  so -1 exponent
+                  , small_guesses_per_year = 1000 * 3600*24*365
+                  , large_guesses_per_year = 100000000 * 3600*24*365;
+
+                $('#generate .entropy').html(entropy + " bits of entropy.<br />" + 
+                  (possibles / small_guesses_per_year).toFixed(1) + " years to guess at 1000 guesses/second.<a href='#online'>[1]</a><br />" +
+                  (possibles / large_guesses_per_year).toFixed(1) + " years to guess at 100 billion guesses/second.<a href='#offline'>[2]</a>");
               };
 
           $('#generate_button').click(generate_password);
@@ -199,17 +178,14 @@
             $('#options').fadeIn();
           });
 
-          $(document).mousemove(function(event) {
-            var x = event.clientX
-              , y = event.clientY
-              , ms = event.timeStamp;
-
+          var add_entropy = function(x, y, ms) {
+            console.log(x, y, ms);
             reminder_elem.removeClass('visible');
             if ( reminder_timeout )
               clearTimeout(reminder_timeout);
             reminder_timeout = setTimeout(show_reminder, 5000);
 
-            buffer = Crypto.SHA256(buffer + x + y + ms);
+            random.addEntropy(x + y + ms);
             events_left--;
             if (  events_left == 0 ) {
               $('#more_entropy').hide();
@@ -220,11 +196,18 @@
             {
               more_entropy_progress_div.css('width', ((TOTAL_EVENTS - events_left)/TOTAL_EVENTS * 100) + '%');
             }
+          };
+
+          $(document).on('mousemove', function(event) {
+            add_entropy(event.clientX, event.clientY, event.timeStamp);
+          }).on('touchmove', function(event) {
+            event = event.originalEvent;
+            add_entropy(event.touches[0].clientX, event.touches[0].clientY, event.timeStamp);
           });
         });
       })(window, jQuery);
     </script>
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:700,400' rel='stylesheet' type='text/css'>
+    <link href="http://fonts.googleapis.com/css?family=Open+Sans:700,400" rel="stylesheet" type="text/css">
     <style>
       .progress {
         width: 300px;
@@ -245,6 +228,12 @@
       body {
         width: 100%;
         font-family: "Open Sans";
+        padding: 0;
+        margin: 0;
+      }
+      html {
+        padding: 0;
+        margin: 0;
       }
 
       #container {
@@ -293,6 +282,10 @@
         opacity: 0;
         -webkit-transition-duration: 1s;
         -webkit-transition-property: opacity;
+        -moz-transition-duration: 1s;
+        -moz-transition-property: opacity;
+        transition-duration: 1s;
+        transition-property: opacity;
       }
       .reminder.visible {
         display: block;
@@ -301,7 +294,7 @@
 
       #options {
         background-color: #ddd;
-        width: 300px;
+        max-width: 300px;
         margin: 20px auto;
         padding: 10px;
         border: 1px #ccc solid;
@@ -321,11 +314,71 @@
         text-decoration: underline;
         cursor: pointer;
       }
+      #generate {
+        margin-bottom: 100px 
+      }
 
+      p {
+        max-width: 40em;
+        margin: 25px auto;
+        text-align: left;
+        color: #555;
+      }
+      a {
+        color: #18c;
+      }
+      a:visited {
+        color: #6e9cb6;
+      }
+
+      footer {
+        position: fixed;
+        backgrond-color: white;
+        display: block;
+        width: 100%;
+        bottom: 0;
+        left: 0;
+        text-align: center;
+        padding-bottom: 5px;
+      }
+
+      @-webkit-keyframes flash {
+        50% { color: black; }
+      }
+      @-moz-keyframes flash {
+        50% { color: black; }
+      }
+      @keyframes flash {
+        50% { color: black; }
+      }
+      p:target {
+        -webkit-animation: flash 1s 2;
+        -moz-animation: flash 1s 2;
+      }
+      p:target sup {
+        color: black;
+      }
+      .entropy a {
+        vertical-align: super;
+        font-size: .75em;
+      }
     </style>
+    <script type="text/javascript">//<![CDATA[
+
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-2670667-1']);
+      _gaq.push(['_trackPageview']);
+      _gaq.push(['_trackPageLoadTime']);
+
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
+    </script>
   </head>
   <body>
-    <a href="http://github.com/fusionbox/mouseware/"><img style="position: absolute; top: 0; right: 0; border: 0;" src="http://a248.e.akamai.net/assets.github.com/img/71eeaab9d563c2b3c590319b398dd35683265e85/687474703a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f677261795f3664366436642e706e67" alt="Fork me on GitHub"></a>
+    <a href="http://github.com/fusionbox/mouseware/"><img style="position: absolute; top: 0; right: 0; border: 0;" src="forkme_ribbon.png" alt="Fork me on GitHub"></a>
     <div id="container">
       <div id="generate" style="display: none;">
         <div class="password"></div>
@@ -338,6 +391,7 @@
           <label><input type="checkbox" name="use_dirty">Include dirty words?</label>
           <label><input type="checkbox" name="use_number">Include a number?</label>
           <label><input type="checkbox" name="use_symbol">Include a symbol?</label>
+          <label><input type="checkbox" name="use_more_words">Include more words?</label>
         </form>
       </div>
       <div id="more_entropy">
@@ -349,6 +403,22 @@
           Um, you're not quite done moving your mouse yet.
         </div>
       </div>
+      <p>
+Mouseware uses a cryptographically secure random number generator based on your mouse movements
+to generate secure, memorable passwords. Passwords are generated entirely in the browser,
+no data is ever sent over the network. The generated passphrases are similar to those generated
+by <a href="http://world.std.com/~reinhold/diceware.html">Diceware</a> or popularized by 
+<a href="http://xkcd.com/936/">xkcd</a>, with an emphasis on easy memorization.
+      </p>
+      <p id="online">
+      <sup>[1]</sup>1000 guesses/second is a worst-case web-based attack. Typically this is the only type of attack feasible against a secure website.
+      </p>
+      <p id="offline">
+      <sup>[2]</sup>100 billion guesses/second is a worst-case offline attack, when a hashed password database is stolen by someone with nontrivial technical and financial resources.
+      </p>
     </div>
+    <footer>
+      <a href="http://www.fusionbox.com/"><img alt="fusionbox" src="fusionbox.gif"></a>
+    </footer>
   </body>
 </html>

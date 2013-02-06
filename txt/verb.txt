@@ -1,6 +1,7 @@
 abated
 abbreviated
 abolished
+aborted
 abridged
 absolved
 absorbed
@@ -11,6 +12,7 @@ accomplished
 accounted for
 accrued
 accumulated
+accused
 achieved
 acquired
 acted
@@ -163,6 +165,7 @@ considered
 consolidated
 constructed
 consulted
+consumed
 consummated
 contacted
 continued
@@ -195,6 +198,8 @@ defined
 delegated
 delineated
 delivered
+demanded
+demolished
 demonstrated
 deployed
 derived
@@ -375,6 +380,7 @@ influenced
 informed
 infused
 initiated
+injected
 innovated
 inspected
 inspired
@@ -382,6 +388,7 @@ installed
 instilled
 instituted
 instructed
+insulted
 insured
 integrated
 intensified
@@ -428,6 +435,7 @@ loaded
 located
 logged
 lost
+loved
 made
 maintained
 managed
@@ -510,6 +518,7 @@ pioneered
 placed
 planned
 played
+poked
 praised
 predicted
 prepared
@@ -695,6 +704,7 @@ studied
 stung
 submitted
 succeeded
+suffered
 suggested
 summarized
 supervised
@@ -709,7 +719,6 @@ swore
 swung
 symbolized
 synthesized
-systemized
 tabulated
 tackled
 talked
