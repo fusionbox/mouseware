@@ -6,14 +6,14 @@ js/random.js
 fusionbox.gif
 forkme_ribbon.png
 js/jquery.min.js
-http://fonts.googleapis.com/css?family=Open+Sans:700,400
-http://www.google-analytics.com/ga.js
-http://themes.googleusercontent.com/static/fonts/opensans/v6/cJZKeOuBrn4kERxqtaUH3T8E0i7KZn-EPnyo3HZu7kw.woff
-http://themes.googleusercontent.com/static/fonts/opensans/v6/k3k702ZOKiLJc3WVjuplzHhCUOGz7vYGh680lGh-uXM.woff
+https://fonts.googleapis.com/css?family=Open+Sans:700,400
+https://www.google-analytics.com/ga.js
+https://themes.googleusercontent.com/static/fonts/opensans/v6/cJZKeOuBrn4kERxqtaUH3T8E0i7KZn-EPnyo3HZu7kw.woff
+https://themes.googleusercontent.com/static/fonts/opensans/v6/k3k702ZOKiLJc3WVjuplzHhCUOGz7vYGh680lGh-uXM.woff
 
 NETWORK:
-http://www.google-analytics.com/__utm.gif
-http://themes.googleusercontent.com/static/fonts/*
+https://www.google-analytics.com/__utm.gif
+https://themes.googleusercontent.com/static/fonts/*
 
 # hopefully just google analytics
 FALLBACK:
