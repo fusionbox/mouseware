@@ -20,6 +20,7 @@
               use_dirty: false
             , use_number: false
             , use_symbol: false
+            , use_spaces: true
             }, options);
           };
 
@@ -101,6 +102,10 @@
             ret.password = new_password.password;
             ret.entropy += new_password.entropy;
           }
+          if ( ! options.use_spaces )
+          {
+            ret.password = ret.password.replace(/ /g, '');
+          }
           return ret;
         };
         
@@ -152,6 +157,7 @@
                   use_dirty: options_form.use_dirty.checked
                 , use_number: options_form.use_number.checked
                 , use_symbol: options_form.use_symbol.checked
+                , use_spaces: options_form.use_spaces.checked
                 });
                 
                 $('#generate .password').text(sentence.password);
@@ -427,6 +433,7 @@
           <label><input type="checkbox" name="use_number">Include a number?</label>
           <label><input type="checkbox" name="use_symbol">Include a symbol?</label>
           <label><input type="checkbox" name="use_more_words">Include more words?</label>
+          <label><input type="checkbox" name="use_spaces" checked="checked">Include spaces between words?</label>
         </form>
       </div>
       <div id="more_entropy">
