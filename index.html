@@ -65,6 +65,15 @@
             entropy -= Math.log(words[token].length)/Math.log(2);
           }
 
+          if (!options.use_spaces) // Capitalize the letters if we don't use spaces
+          {
+            for ( i = 0; i < sentence.length; i++ ) {
+              token = sentence[i];
+              token = token.substr(0, 1).toUpperCase() + token.substr(1);
+              sentence[i] = token;
+            }
+          }
+
           var ret = {
             password: sentence.join(" ")
           , entropy: entropy
