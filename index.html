@@ -181,7 +181,10 @@
                   (possibles / large_guesses_per_hour).toFixed(1) + " hours to guess at 100 billion guesses/second.<a href='#offline'>[2]</a>");
               };
 
-          $('#generate_button').click(generate_password);
+          $('#generate_button').click(function() {
+            generate_password()
+            _gaq.push(['_trackEvent', 'Mouseware', 'generate_password'])
+          });
 
           if ( events_left == 0 ) {
             $('#more_entropy').hide();
@@ -205,6 +208,7 @@
             if (  events_left == 0 ) {
               $('#more_entropy').hide();
               $('#generate').show();
+              _gaq.push(['_trackEvent', 'Mouseware', 'enough_entropy'])
               generate_password();
             }
             else if ( events_left > 0 && events_left % 10 == 0 )
