@@ -150,13 +150,23 @@
           return entropy;
         };
 
+        words.all_words = [];
+        for ( type in words ) {
+          if ( words.hasOwnProperty(type) ) {
+            for ( var i = 0; i < words[type].length; i++ ) {
+              if ( words.all_words.indexOf(words[type][i]) === -1 )
+                words.all_words.push(words[type][i]);
+            }
+          }
+        }
+
         $(document).ready(function() {
           var more_entropy_progress_div = $('#more_entropy .progress div')
             , reminder_elem = $('#more_entropy .reminder')
             , show_reminder = function() { reminder_elem.addClass('visible'); }
             , reminder_timeout = null
             , generate_password = function() {
-                var template = ['adjective', 'noun', 'verb', 'adjective', 'noun']
+                var template = ['all_words', 'all_words', 'all_words', 'all_words', 'all_words']
                   , options_form = $('#options')[0];
                 
                 if ( options_form.use_more_words.checked )
