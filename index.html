@@ -161,6 +161,12 @@
                 
                 if ( options_form.use_more_words.checked )
                   template = ['article', 'adjective', 'noun', 'verb', 'article', 'adjective', 'noun'];
+
+                if ( options_form.diceware.checked ) {
+                  template = ['diceware', 'diceware', 'diceware', 'diceware', 'diceware'];
+                  if ( options_form.use_more_words.checked )
+                    template = template.concat(['diceware', 'diceware']);
+                }
                 
                 var sentence = exports.sentencePassword(template, {
                   use_dirty: options_form.use_dirty.checked
@@ -195,6 +201,12 @@
           $('#toggle_options_button').click(function() {
             $('.toggleOptions').hide();
             $('#options').fadeIn();
+          });
+
+          $('.enable_diceware').click(function() {
+            $('#toggle_options_button').click();
+            $('#options [name=diceware]').prop('checked', true);
+            generate_password();
           });
 
           var add_entropy = function(x, y, ms) {
@@ -447,6 +459,7 @@
           <label><input type="checkbox" name="use_symbol">Include a symbol?</label>
           <label><input type="checkbox" name="use_more_words">Include more words?</label>
           <label><input type="checkbox" name="use_spaces" checked="checked">Include spaces between words?</label>
+          <label><input type="checkbox" name="diceware">Use the diceware wordlist</label>
         </form>
       </div>
       <div id="more_entropy">
@@ -464,6 +477,11 @@ to generate secure, memorable passwords. Passwords are generated entirely in the
 no data is ever sent over the network. The generated passphrases are similar to those generated
 by <a href="http://world.std.com/~reinhold/diceware.html">Diceware</a> or popularized by 
 <a href="http://xkcd.com/936/">xkcd</a>, with an emphasis on easy memorization.
+      </p>
+      <p>
+        Mouseware can now optionally use the diceware word list.
+        <a class="enable_diceware">Enable</a> secure diceware password
+        generation.
       </p>
       <p id="online">
       <sup>[1]</sup>1000 guesses/second is a worst-case web-based attack. Typically this is the only type of attack feasible against a secure website.
