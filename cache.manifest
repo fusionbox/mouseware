@@ -1,8 +1,9 @@
 CACHE MANIFEST
-# version 11
+# version 12
 js/crypto-sha256.js
 js/wordlist.js
 js/random.js
+favicon.ico
 fusionbox.gif
 forkme_ribbon.png
 js/jquery.min.js

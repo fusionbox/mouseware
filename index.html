@@ -5,6 +5,8 @@
     <title>Mouseware Secure Password Generator | Fusionbox</title>
     <meta name="description" content="Mouseware is a strong a secure password generator that uses your mouse movements to generate easy-to-remember passwords." />
     <meta name="keywords" content="strong password generator, secure password generator" />
+    <link rel="icon" href="favicon.ico"  type="image/x-icon">
+    <link rel="shortcut icon" href="favicon.ico"  type="image/x-icon">
     <script src="js/crypto-sha256.js"></script>
     <script src="js/random.js"></script>
     <script src="js/wordlist.js"></script>
@@ -13,10 +15,10 @@
       (function(exports, $) {
         var TOTAL_EVENTS = 500
           , events_left = TOTAL_EVENTS;
- 
+
         if ( random.ready() )
           events_left = 0;
-    
+
         function parseOptions(options) {
           return $.extend({
               use_dirty: false
@@ -32,23 +34,23 @@
             , haystack
             , token
             , i;
-          
+
           options = parseOptions(options);
-          
+
           for ( i = 0; i < template.length; i++ ) {
             token = template[i];
             haystack = words[token];
 
             if ( ! haystack )
               throw new Error('Unknown token "' + token + '"');
-            
+
             if ( options.use_dirty )
               haystack = haystack.concat(words["dirty_" + token]);
 
             sentence.push(random.choice(haystack));
             entropy += Math.log(haystack.length)/Math.log(2);
           }
-          
+
           if ( options.use_dirty )
           {
             // choose a random word to replace with a dirty word
@@ -60,9 +62,9 @@
               haystack = words["dirty_" + token];
             } while ( ! haystack
                       || haystack.length == 0 )
-            
+
             sentence[i] = random.choice(haystack);
-            
+
             entropy += Math.log(template.length)/Math.log(2);
             entropy -= Math.log(words[token].length)/Math.log(2);
           }
@@ -119,7 +121,7 @@
           }
           return ret;
         };
-        
+
         exports.addReplacement = function(replacements, string) {
           var chars = string.split('')
             , i
@@ -139,16 +141,16 @@
         exports.templateEntropy = function(template, options) {
           var entropy = 0
             , haystack;
-          
+
           options = parseOptions(options);
-          
+
           for ( var i = 0; i < template.length; i++ ) {
             haystack = words[template[i]];
             if ( options.use_dirty )
               haystack = haystack.concat(words["dirty_" + template[i]]);
             entropy += Math.log(haystack.length)/Math.log(2);
           }
-          
+
           return entropy;
         };
 
@@ -160,7 +162,7 @@
             , generate_password = function() {
                 var template = ['adjective', 'noun', 'verb', 'adjective', 'noun']
                   , options_form = $('#options')[0];
-                
+
                 if ( options_form.use_more_words.checked )
                   template = ['article', 'adjective', 'noun', 'verb', 'article', 'adjective', 'noun'];
 
@@ -169,22 +171,22 @@
                   if ( options_form.use_more_words.checked )
                     template = template.concat(['diceware', 'diceware']);
                 }
-                
+
                 var sentence = exports.sentencePassword(template, {
                   use_dirty: options_form.use_dirty.checked
                 , use_number: options_form.use_number.checked
                 , use_symbol: options_form.use_symbol.checked
                 , use_spaces: options_form.use_spaces.checked
                 });
-                
+
                 $('#generate .password').text(sentence.password);
-                
+
                 var entropy = sentence.entropy.toFixed(1)
                   , possibles = Math.pow(2, sentence.entropy - 1) // on average, only half the possibilities will be needed.  so -1 exponent
                   , small_guesses_per_year = 1000 * 3600*24*365
                   , large_guesses_per_hour = 1e11 * 3600;
 
-                $('#generate .entropy').html(entropy + " bits of entropy.<br />" + 
+                $('#generate .entropy').html(entropy + " bits of entropy.<br />" +
                   (possibles / small_guesses_per_year).toFixed(1) + " years to guess at 1000 guesses/second.<a href='#online'>[1]</a><br />" +
                   (possibles / large_guesses_per_hour).toFixed(1) + " hours to guess at 100 billion guesses/second.<a href='#offline'>[2]</a>");
               };
@@ -350,7 +352,7 @@
         cursor: pointer;
       }
       #generate {
-        margin-bottom: 100px 
+        margin-bottom: 100px
       }
 
       p {
@@ -459,7 +461,7 @@
 Mouseware uses a cryptographically secure random number generator based on your mouse movements
 to generate secure, memorable passwords. Passwords are generated entirely in the browser,
 no data is ever sent over the network. The generated passphrases are similar to those generated
-by <a href="http://world.std.com/~reinhold/diceware.html">Diceware</a> or popularized by 
+by <a href="http://world.std.com/~reinhold/diceware.html">Diceware</a> or popularized by
 <a href="http://xkcd.com/936/">xkcd</a>, with an emphasis on easy memorization.
       </p>
       <p>
