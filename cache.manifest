@@ -12,9 +12,4 @@ https://themes.googleusercontent.com/static/fonts/opensans/v6/cJZKeOuBrn4kERxqta
 https://themes.googleusercontent.com/static/fonts/opensans/v6/k3k702ZOKiLJc3WVjuplzHhCUOGz7vYGh680lGh-uXM.woff
 
 NETWORK:
-https://www.google-analytics.com/__utm.gif
-https://themes.googleusercontent.com/static/fonts/*
-
-# hopefully just google analytics
-FALLBACK:
-/ blank
+*
