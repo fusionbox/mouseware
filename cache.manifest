@@ -1,20 +1,12 @@
 CACHE MANIFEST
-# version 11
+# version 12
 js/crypto-sha256.js
 js/wordlist.js
 js/random.js
+favicon.ico
 fusionbox.gif
-forkme_ribbon.png
 js/jquery.min.js
-https://fonts.googleapis.com/css?family=Open+Sans:700,400
-https://www.google-analytics.com/ga.js
-https://themes.googleusercontent.com/static/fonts/opensans/v6/cJZKeOuBrn4kERxqtaUH3T8E0i7KZn-EPnyo3HZu7kw.woff
-https://themes.googleusercontent.com/static/fonts/opensans/v6/k3k702ZOKiLJc3WVjuplzHhCUOGz7vYGh680lGh-uXM.woff
+forkme_ribbon.png
 
 NETWORK:
-https://www.google-analytics.com/__utm.gif
-https://themes.googleusercontent.com/static/fonts/*
-
-# hopefully just google analytics
-FALLBACK:
-/ blank
+*
