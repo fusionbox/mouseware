@@ -25,6 +25,7 @@
             , use_number: false
             , use_symbol: false
             , use_spaces: true
+            , use_capital: false
             }, options);
           };
 
@@ -115,6 +116,16 @@
             ret.password = new_password.password;
             ret.entropy += new_password.entropy;
           }
+          if ( options.use_capital )
+          {
+            var alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
+            var tr = {};
+            for ( var i = 0; i < alphabet.length; i++ )
+              tr[alphabet[i]] = alphabet[i].toUpperCase();
+            var new_password = exports.addReplacement(tr, ret.password);
+            ret.password = new_password.password;
+            ret.entropy += new_password.entropy;
+          }
           if ( ! options.use_spaces )
           {
             ret.password = ret.password.replace(/ /g, '');
@@ -125,16 +136,30 @@
         exports.addReplacement = function(replacements, string) {
           var chars = string.split('')
             , i
-            , replaceable = new RegExp('[' + Object.keys(replacements) + ']', 'g');
+            , replaceable
+            , anything_to_replace
 
-          do {
-            i = random.random(chars.length);
-          } while ( ! chars[i].match(replaceable) )
+          for ( i in replacements ) {
+            if ( replacements.hasOwnProperty(i) && string.search(i) == -1 )
+                delete replacements[i]
+          }
+          anything_to_replace = Object.keys(replacements).length != 0;
+          replaceable = new RegExp('[' + Object.keys(replacements) + ']', 'g');
 
-          chars[i] = replacements[chars[i]];
+          if ( anything_to_replace ) {
+            while ( true ) {
+              i = random.random(chars.length);
+              if ( typeof replacements[chars[i]] != "undefined" )
+              {
+                chars[i] = replacements[chars[i]];
+                break;
+              }
+            }
+          }
+
           return {
             password: chars.join('')
-          , entropy: Math.log(string.match(replaceable).length)/Math.log(2)
+          , entropy: anything_to_replace ? Math.log(string.match(replaceable).length)/Math.log(2) : 0
           };
         };
 
@@ -177,6 +202,7 @@
                 , use_number: options_form.use_number.checked
                 , use_symbol: options_form.use_symbol.checked
                 , use_spaces: options_form.use_spaces.checked
+                , use_capital: options_form.use_capital.checked
                 });
 
                 $('#generate .password').text(sentence.password);
@@ -443,6 +469,7 @@
           <label><input type="checkbox" name="use_dirty">Include dirty words?</label>
           <label><input type="checkbox" name="use_number">Include a number?</label>
           <label><input type="checkbox" name="use_symbol">Include a symbol?</label>
+          <label><input type="checkbox" name="use_capital">Include a capital letter?</label>
           <label><input type="checkbox" name="use_more_words">Include more words?</label>
           <label><input type="checkbox" name="use_spaces" checked="checked">Include spaces between words?</label>
           <label><input type="checkbox" name="diceware">Use the diceware wordlist</label>
