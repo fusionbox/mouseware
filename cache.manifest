@@ -2,6 +2,7 @@ CACHE MANIFEST
 # version 12
 js/crypto-sha256.js
 js/wordlist.js
+js/markovchain.js
 js/random.js
 favicon.ico
 fusionbox.gif
