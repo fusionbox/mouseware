@@ -6,6 +6,10 @@ import sys
 import random
 
 
+NGRAM_LENGTH = 3
+MIN_WORD_LENGTH = 5
+
+
 class MarkovChain(object):
     """
     An abstract MarkovChain.
@@ -72,8 +76,8 @@ class PassphraseMarkovChain(MarkovChain):
     def to_json(self):
         return json.dumps(
             {
-                'starting_tokens': [''.join(value) for value in self.starting_tokens],
-                'starting_distribution': self.alias_distribution.json_data(),
+                'startingNgrams': [''.join(value) for value in self.starting_tokens],
+                'startingDistribution': self.alias_distribution.json_data(),
                 'nodes': {
                     ''.join(token): node.json_data()
                     for (token, (node, count)) in self.tokens.items()
@@ -120,8 +124,7 @@ class MarkovNode(object):
         return {
             'ngram': ''.join(self.value),
             'transitions': [''.join(value) for value in self.transition_counts],
-            'aliasTable': self.alias_distribution.json_data(),
-            'entropy': self.alias_distribution.entropy,
+            'aliasDistribution': self.alias_distribution.json_data(),
         }
 
     def __repr__(self):
@@ -175,8 +178,9 @@ class AliasDistribution(object):
 
     def json_data(self):
         return {
-            'probability_table': self.probability_table,
-            'alias_table': self.alias_table,
+            'probabilityTable': self.probability_table,
+            'aliasTable': self.alias_table,
+            'entropy': self.entropy,
         }
 
 
@@ -184,25 +188,30 @@ def entropy(probs):
     return -sum(p * math.log(p, 2) for p in probs)
 
 
-def get_ngrams(n, infile):
-    cleaned = ' '.join(map(clean_line, infile))
+def get_ngrams(infile):
+    cleaned_lines = [clean_line(line) for line in infile]
+    cleaned = ' '.join(line for line in cleaned_lines if line)
 
-    its = list(itertools.tee(cleaned, n))
-    for i in range(n):
+    its = list(itertools.tee(cleaned, NGRAM_LENGTH))
+    for i in range(NGRAM_LENGTH):
         for j in range(i):
             next(its[i])
+
     return zip(*its)
 
 
 def clean_line(line):
-    words = line.lower().strip().split(' ')
-    return ' '.join(word for word in words if word.isalpha())
+    words = [
+        word for word in line.lower().strip().split(' ')
+        if word.isalpha() and len(word) >= MIN_WORD_LENGTH
+    ]
+    return ' '.join(words)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Generate passphrases using markov chains")
     parser.add_argument('file', type=argparse.FileType('r'), nargs='?')
     args = parser.parse_args()
-    corpus = get_ngrams(3, args.file or sys.stdin)
+    corpus = get_ngrams(args.file or sys.stdin)
     chain = PassphraseMarkovChain(corpus)
     print(chain.get_passphrase(80))

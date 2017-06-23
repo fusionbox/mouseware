@@ -3,6 +3,7 @@ CACHE MANIFEST
 js/crypto-sha256.js
 js/wordlist.js
 js/markovchain.js
+js/markovpass.js
 js/random.js
 favicon.ico
 fusionbox.gif

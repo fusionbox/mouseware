@@ -31,7 +31,7 @@ def build_markovchain():
     dest = "js/markovchain.js"
 
     with fileinput.input(files=glob.glob(src)) as f:
-        corpus = markov.get_ngrams(3, f)
+        corpus = markov.get_ngrams(f)
 
     chain = markov.PassphraseMarkovChain(corpus)
 
