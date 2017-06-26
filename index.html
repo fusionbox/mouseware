@@ -165,32 +165,42 @@
                 var template = ['adjective', 'noun', 'verb', 'adjective', 'noun']
                   , options_form = $('#options')[0];
 
-                if ( options_form.use_more_words.checked )
-                  template = ['article', 'adjective', 'noun', 'verb', 'article', 'adjective', 'noun'];
-
-                if ( options_form.diceware.checked ) {
-                  template = ['diceware', 'diceware', 'diceware', 'diceware', 'diceware'];
+                if (options_form.markov.checked) {
+                  var passwordInfo = genMarkovPassphrase(markovChain)
+                    , password = passwordInfo.password
+                    , entropy = passwordInfo.entropy.toFixed(1)
+                    , entropyHtml = entropy + ' bits of estimated entropy.';
+                } else {
                   if ( options_form.use_more_words.checked )
-                    template = template.concat(['diceware', 'diceware']);
+                    template = ['article', 'adjective', 'noun', 'verb', 'article', 'adjective', 'noun'];
+
+                  if ( options_form.diceware.checked ) {
+                    template = ['diceware', 'diceware', 'diceware', 'diceware', 'diceware'];
+                    if ( options_form.use_more_words.checked )
+                      template = template.concat(['diceware', 'diceware']);
+                  }
+
+                  var sentence = exports.sentencePassword(template, {
+                    use_dirty: options_form.use_dirty.checked
+                  , use_number: options_form.use_number.checked
+                  , use_symbol: options_form.use_symbol.checked
+                  , use_spaces: options_form.use_spaces.checked
+                  });
+
+                  var entropy = sentence.entropy.toFixed(1)
+                    , possibles = Math.pow(2, sentence.entropy - 1) // on average, only half the possibilities will be needed.  so -1 exponent
+                    , small_guesses_per_year = 1000 * 3600*24*365
+                    , large_guesses_per_hour = 1e11 * 3600;
+
+                  var entropyHtml = entropy + " bits of entropy.<br />" +
+                  (possibles / small_guesses_per_year).toFixed(1) + " years to guess at 1000 guesses/second.<a href='#online'>[1]</a><br />" +
+                  (possibles / large_guesses_per_hour).toFixed(1) + " hours to guess at 100 billion guesses/second.<a href='#offline'>[2]</a>"
+
+                  var password = sentence.password;
                 }
 
-                var sentence = exports.sentencePassword(template, {
-                  use_dirty: options_form.use_dirty.checked
-                , use_number: options_form.use_number.checked
-                , use_symbol: options_form.use_symbol.checked
-                , use_spaces: options_form.use_spaces.checked
-                });
-
-                $('#generate .password').text(sentence.password);
-
-                var entropy = sentence.entropy.toFixed(1)
-                  , possibles = Math.pow(2, sentence.entropy - 1) // on average, only half the possibilities will be needed.  so -1 exponent
-                  , small_guesses_per_year = 1000 * 3600*24*365
-                  , large_guesses_per_hour = 1e11 * 3600;
-
-                $('#generate .entropy').html(entropy + " bits of entropy.<br />" +
-                  (possibles / small_guesses_per_year).toFixed(1) + " years to guess at 1000 guesses/second.<a href='#online'>[1]</a><br />" +
-                  (possibles / large_guesses_per_hour).toFixed(1) + " hours to guess at 100 billion guesses/second.<a href='#offline'>[2]</a>");
+                $('#generate .password').text(password);
+                $('#generate .entropy').html(entropyHtml);
               };
 
           $('#generate_button').click(generate_password);
@@ -210,6 +220,11 @@
             $('#toggle_options_button').click();
             $('#options [name=diceware]').prop('checked', true);
             generate_password();
+          });
+
+          $('[name=markov]').on('change', function() {
+            var disabled = $('[name=markov]').prop('checked');
+            $('#options input[type=checkbox]:not([name=markov])').prop('disabled', disabled);
           });
 
           var add_entropy = function(x, y, ms) {
@@ -448,6 +463,7 @@
           <label><input type="checkbox" name="use_more_words">Include more words?</label>
           <label><input type="checkbox" name="use_spaces" checked="checked">Include spaces between words?</label>
           <label><input type="checkbox" name="diceware">Use the diceware wordlist</label>
+          <label><input type="checkbox" name="markov">Generate markov chain passphrase</label>
         </form>
       </div>
       <div id="more_entropy">
@@ -460,22 +476,39 @@
         </div>
       </div>
       <p>
-Mouseware uses a cryptographically secure random number generator based on your mouse movements
-to generate secure, memorable passwords. Passwords are generated entirely in the browser,
-no data is ever sent over the network. The generated passphrases are similar to those generated
-by <a href="http://world.std.com/~reinhold/diceware.html">Diceware</a> or popularized by
-<a href="http://xkcd.com/936/">xkcd</a>, with an emphasis on easy memorization.
+        Mouseware uses a cryptographically secure random number generator based
+        on your mouse movements to generate secure, memorable passwords.
+        Passwords are generated entirely in the browser, no data is ever sent
+        over the network. The generated passphrases are similar to those
+        generated by <a
+          href="http://world.std.com/~reinhold/diceware.html">Diceware</a> or
+        popularized by <a href="http://xkcd.com/936/">xkcd</a>, with an
+        emphasis on easy memorization.
       </p>
       <p>
         Mouseware can now optionally use the diceware word list.
         <a class="enable_diceware">Enable</a> secure diceware password
         generation.
       </p>
+      <p>
+        Mouseware also provides an alternative markov chain based password
+        generation method. This method generates passwords that provide a
+        balance between ease of memorization and randomness by creating
+        passphrases which feel like english words without being limited to
+        actual english words. For a given length, the passphrases will on
+        average be harder to guess, however this method provides weaker
+        guarantees since the generation method is less uniform, and more
+        difficult to analyze.
+      </p>
       <p id="online">
-      <sup>[1]</sup>1000 guesses/second is a worst-case web-based attack. Typically this is the only type of attack feasible against a secure website.
+        <sup>[1]</sup>1000 guesses/second is a worst-case web-based attack.
+        Typically this is the only type of attack feasible against a secure
+        website.
       </p>
       <p id="offline">
-      <sup>[2]</sup>100 billion guesses/second is a worst-case offline attack, when a hashed password database is stolen by someone with nontrivial technical and financial resources.
+        <sup>[2]</sup>100 billion guesses/second is a worst-case offline attack,
+        when a hashed password database is stolen by someone with nontrivial
+        technical and financial resources.
       </p>
     </div>
     <footer>
