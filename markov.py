@@ -12,7 +12,7 @@ MIN_WORD_LENGTH = 5
 
 class MarkovChain(object):
     """
-    An abstract MarkovChain.
+    A general MarkovChain.
 
     `corpus` can be any iterable of hashable ngrams.
     """
@@ -90,7 +90,7 @@ class MarkovNode(object):
     """
     A node in a MarkovChain.
 
-    `value` must be hashable token.
+    `value` must be a hashable token.
     """
     def __init__(self, value):
         self.value = value
@@ -136,10 +136,8 @@ class AliasDistribution(object):
     An alias table distribution.
 
     Used for selecting an index from a weighted distribution. `distribution`
-    should be a list of probabilities which sum to 1. The distribution is built
-    in O(n) time, and choices are O(1).
-
-    Use `choice` to get a random weighted index from the distribution.
+    should be a list of probabilities which sum to 1. See
+    https://en.wikipedia.org/wiki/Alias_method.
 
     If `d = AliasDistribution([0.2, 0.2, 0.6])`, `d.choice()` will return
     each of `0`, or `1` 20% of the time, and `2` 60% of the time.
@@ -214,4 +212,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
     corpus = get_ngrams(args.file or sys.stdin)
     chain = PassphraseMarkovChain(corpus)
-    print(chain.get_passphrase(80))
+    print(chain.get_passphrase(60))
