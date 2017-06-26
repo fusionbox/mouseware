@@ -4,26 +4,41 @@
 ;(function(exports) {
   var MIN_ENTROPY = 60;
 
-  function pickFromAliasDistribution(choices, distribution) {
-    var i = random.random(choices.length);
+  function randomFloat() {
     // See https://docs.oracle.com/javase/7/docs/api/java/util/Random.html#nextFloat()
-    var y = random.random(1 << 24) / (1 << 24);
+    //
+    // Javascript numbers are actually doubles, so in principle something like
+    // nextDouble would be more correct, but that algorithm requires 64 bit
+    // integers. While we could replicate that, 24 bits of randomness is plenty
+    // for our purposes.
+
+    return random.random(1 << 24) / (1 << 24);
+  }
+
+  function pickFromAliasDistribution(distribution) {
+    var i = random.random(distribution.probabilityTable.length);
+    var y  = randomFloat();
     if (distribution.probabilityTable[i] < y) {
       i = distribution.aliasTable[i];
     }
-    return choices[i];
+    return i;
   }
 
-  exports.genPassphrase = function() {
-    var ngram = pickFromAliasDistribution(markovChain.startingNgrams, markovChain.startingDistribution);
+  exports.genMarkovPassphrase = function(markovChain) {
+    var ngram = markovChain.startingNgrams[
+      pickFromAliasDistribution(markovChain.startingDistribution)
+    ];
     var ngrams = [ngram];
-    var e = markovChain.startingDistribution.entropy;
-    while (e < MIN_ENTROPY || ngram.slice(-1) != ' ') {
+    var entropy = markovChain.startingDistribution.entropy;
+    while (entropy < MIN_ENTROPY || ngram.slice(-1) !== ' ') {
       var nodeData = markovChain.nodes[ngram];
-      e += nodeData.aliasDistribution.entropy;
-      ngram = pickFromAliasDistribution(nodeData.transitions, nodeData.aliasDistribution)
+      ngram = nodeData.transitions[pickFromAliasDistribution(nodeData.aliasDistribution)];
       ngrams.push(ngram);
+      entropy += nodeData.aliasDistribution.entropy;
     }
-    return ngrams.map(function(s) { return s.charAt(1); }).join("");
+    return {
+      password: ngrams.map(function(s) { return s.charAt(1); }).join(""),
+      entropy: entropy,
+    };
   };
 })(window);
