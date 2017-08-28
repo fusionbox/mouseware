@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import json
 import fileinput
@@ -31,10 +31,14 @@ def build_markovchain():
     dest = "js/markovchain.js"
 
     with fileinput.input(files=glob.glob(src)) as f:
-        corpus = markov.get_ngrams(3, f)
+        corpus = markov.get_ngrams(f)
 
     chain = markov.PassphraseMarkovChain(corpus)
-    print(chain.to_json())
+
+    with open(dest, 'w') as f:
+        f.write("var markovChain = ")
+        f.write(chain.to_json())
+        f.write(";")
 
 
 if __name__ == "__main__":
