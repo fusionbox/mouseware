@@ -1,0 +1,184 @@
+.progress {
+  width: 300px;
+  height: 50px;
+  border: 1px solid black;
+  margin: 20px auto;
+  border-radius: 3px;
+  border: solid 3px #ddd;
+  background-color: #ddd;
+  background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.01, #fff), color-stop(1.00, #eee));
+  background-image: -moz-linear-gradient(center bottom, #fff 1%, #eee 100%);
+}
+.progress > div {
+  background-color: orange;
+  height: inherit;
+  width: 0;
+}
+
+body {
+  width: 100%;
+  font-family: "Open Sans";
+  padding: 0;
+  margin: 0;
+}
+html {
+  padding: 0;
+  margin: 0;
+}
+
+#container {
+  text-align: center;
+  margin: 50px auto;
+}
+
+.password {
+  font-size: 1.5em;
+}
+
+.entropy {
+  margin-top: 5px;
+  color: #666;
+}
+
+#generate button {
+  margin-top: 20px;
+  color: #ffffff;
+  cursor: pointer;
+  font-size: 24px;
+  font-weight: bold;
+  font-family: "Open Sans";
+  margin: 5px;
+  padding: 4px 10px 6px 10px;
+  text-decoration: none;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  border-radius: 3px;
+  border: solid 1px #557766;
+  background-color: #4BA822;
+  background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.01, #2B8802), color-stop(1.00, #4BA822));
+  background-image: -moz-linear-gradient(center bottom, #2B8802 1%, #4BA822 100%);
+  text-shadow: #333333 0px 1px 0px;
+  letter-spacing: -1px;
+}
+#generate button:hover {
+  background-color: #56C325;
+  background-image: -webkit-gradient(linear, left bottom, left top, color-stop(0.01, #36a305), color-stop(1.00, #56C325));
+  background-image: -moz-linear-gradient(center bottom, #36a305 1%, #56C325 100%);
+  -moz-box-shadow: 0px 1px 2px #aaaaaa; -webkit-box-shadow: 0px 1px 2px #aaaaaa; box-shadow: 0px 1px 2px #aaaaaa;
+}
+
+.reminder {
+  color: grey;
+  opacity: 0;
+  -webkit-transition-duration: 1s;
+  -webkit-transition-property: opacity;
+  -moz-transition-duration: 1s;
+  -moz-transition-property: opacity;
+  transition-duration: 1s;
+  transition-property: opacity;
+}
+.reminder.visible {
+  display: block;
+  opacity: 1;
+}
+
+#options {
+  background-color: #ddd;
+  max-width: 300px;
+  margin: 20px auto;
+  padding: 10px;
+  border: 1px #ccc solid;
+  border-radius: 4px;
+}
+#options label {
+  display: block;
+  text-align: left;
+  color: #666;
+}
+
+.toggleOptions {
+  margin-top: 20px;
+}
+.toggleOptions a {
+  color: #aaa;
+  text-decoration: underline;
+  cursor: pointer;
+}
+#generate {
+  margin-bottom: 100px
+}
+
+p {
+  max-width: 40em;
+  margin: 25px auto;
+  text-align: left;
+  color: #555;
+}
+a {
+  color: #18c;
+}
+a:visited {
+  color: #6e9cb6;
+}
+
+footer {
+  position: fixed;
+  backgrond-color: white;
+  display: block;
+  width: 100%;
+  bottom: 0;
+  left: 0;
+  text-align: center;
+  padding-bottom: 5px;
+}
+
+footer .code {
+  padding-bottom: 5px;
+  font-size: .75em;
+  /* hidden unless on a narrow screen */
+  display: none;
+}
+
+@-webkit-keyframes flash {
+  50% { color: black; }
+}
+@-moz-keyframes flash {
+  50% { color: black; }
+}
+@keyframes flash {
+  50% { color: black; }
+}
+p:target {
+  -webkit-animation: flash 1s 2;
+  -moz-animation: flash 1s 2;
+}
+p:target sup {
+  color: black;
+}
+.entropy a {
+  vertical-align: super;
+  font-size: .75em;
+}
+
+.forkme img {
+  position: absolute;
+  top: 0;
+  right: 0;
+  border: 0;
+}
+
+@media screen and (max-width: 800px) {
+  .forkme {
+    display: none;
+  }
+  footer .code {
+    display: block;
+  }
+}
+
+@media screen and (max-height: 693px) {
+  footer {
+    position: relative;
+  }
+}
+
